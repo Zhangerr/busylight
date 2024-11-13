@@ -1,34 +1,12 @@
 import subprocess
-import sys
 import time
 
 import hid
 
-# import usb.core
-# import usb.util
+# From `system_profiler SPUSBDataType`
 
-# Find the USB device by vendor ID and product ID
-vendor_id = 0x27BB  # Replace with your device's vendor ID
-product_id = 0x3BCF  # Replace with your device's product ID
-
-# device = usb.core.find(idVendor=vendor_id, idProduct=product_id)
-# if device is None:
-#     raise ValueError("Device not found")
-# # Claim the interface
-# # interface = device[0]
-# device.set_configuration()
-# cfg = device.get_active_configuration()
-
-# intf = cfg[(0, 0)]
-# ep = usb.util.find_descriptor(
-#     intf,
-#     # match the first OUT endpoint
-#     custom_match=lambda e: usb.util.endpoint_direction(e.bEndpointAddress)
-#     == usb.util.ENDPOINT_OUT,
-# )
-# alternate_setting = interface.bInterfaceNumber
-# interface.set_altsetting(alternate_setting)
-# Send bytes to the device
+vendor_id = 0x27BB
+product_id = 0x3BCF
 
 
 class BusylightCommandStep:
@@ -79,14 +57,6 @@ class BusylightSDK:
         bytes_array[63] = checksum % 256
         return bytes_array
 
-    def WriteToDevice(self, bytes_array):
-        print(bytes_array)
-        # implement device communication logic here
-
-    def SetTimer(self):
-        # implement timer logic here
-        pass
-
     def GetPulseColor(self, intensity, color):
         intens = min(100, intensity)
         return BusylightColor(
@@ -108,7 +78,6 @@ class BusylightSDK:
         cmd.RepeatInterval = 1
         cmd_bytes = self.GenerateCommands([cmd])
         return cmd_bytes
-        # self.WriteToDevice(cmd_bytes)
 
 
 class BusylightColor:
@@ -125,153 +94,12 @@ BusylightColor_Yellow = BusylightColor(100, 100, 0)
 BusylightColor_Orange = BusylightColor(100, 26, 0)
 BusylightColor_Purple = BusylightColor(70, 0, 87)
 
-red_data_to_send = [
-    16,
-    1,
-    100,
-    0,
-    0,
-    1,
-    0,
-    128,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    255,
-    255,
-    255,
-    3,
-    243,
-]
-
-green_data_to_send = [
-    143,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    255,
-    255,
-    255,
-    3,
-    140,
-]
-
 
 sdk = BusylightSDK()
-# print(set(green_data_to_send) - set(sdk.Color(BusylightColor_Red)))
-# print(list(sdk.Color(BusylightColor_Green)))
-# print(list(sdk.Color(BusylightColor_Red)))
-# print(sys.argv[1] == "red")
+
 while True:
     try:
         with hid.Device(vendor_id, product_id) as h:
-            # print(f"Device manufacturer: {h.manufacturer}")
-            # print(f"Product: {h.product}")
-            # print(f"Serial Number: {h.serial}")
-            # h.nonblocking = 0
             is_in_dnd = (
                 subprocess.run(
                     [
@@ -293,8 +121,3 @@ while True:
         print("Error: ", e)
 
     time.sleep(2)
-
-# endpoint = interface[0]
-# ep.write(data_to_send)
-# Release the interface
-# usb.util.release_interface(device, interface.bInterfaceNumber)
