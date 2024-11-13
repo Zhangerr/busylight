@@ -1,5 +1,6 @@
 import subprocess
 import time
+import datetime
 
 import hid
 
@@ -119,8 +120,8 @@ while True:
                 sdk.Color(BusylightColor_Red if is_in_dnd else BusylightColor_Green)
             )
             h.write(bytes_to_send)
-            print("In DND" if is_in_dnd else "Not in DND")
+            print(f"[{datetime.datetime.now()}] " +  ("In DND" if is_in_dnd else "Not in DND"))
+            time.sleep(2)
     except hid.HIDException as e:
-        print("Error: ", e)
-
-    time.sleep(2)
+        print(f"[{datetime.datetime.now()}] Error: ", e)
+        time.sleep(10)
