@@ -100,6 +100,9 @@ sdk = BusylightSDK()
 while True:
     try:
         with hid.Device(vendor_id, product_id) as h:
+            # https://stackoverflow.com/questions/71807412/how-to-read-do-not-disturb-using-applescript
+            # https://stackoverflow.com/questions/89228/how-do-i-execute-a-program-or-call-a-system-command
+
             is_in_dnd = (
                 subprocess.run(
                     [
