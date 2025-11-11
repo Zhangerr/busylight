@@ -1,6 +1,6 @@
+import datetime
 import subprocess
 import time
-import datetime
 
 import hid
 
@@ -120,8 +120,15 @@ while True:
                 sdk.Color(BusylightColor_Red if is_in_dnd else BusylightColor_Green)
             )
             h.write(bytes_to_send)
-            print(f"[{datetime.datetime.now()}] " +  ("In DND" if is_in_dnd else "Not in DND"))
+
+            # https://stackoverflow.com/questions/5419389/how-to-overwrite-the-previous-print-to-stdout
+            print(
+                f"\r\033[2K [{datetime.datetime.now()}] "
+                + ("In DND" if is_in_dnd else "Not in DND"),
+                end="",
+                flush=True,
+            )
             time.sleep(2)
     except hid.HIDException as e:
-        print(f"[{datetime.datetime.now()}] Error: ", e)
+        print(f"\r\033[2K [{datetime.datetime.now()}] Error: ", e, end="", flush=True)
         time.sleep(10)
