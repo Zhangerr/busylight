@@ -98,6 +98,16 @@ BusylightColor_Purple = BusylightColor(70, 0, 87)
 
 sdk = BusylightSDK()
 
+
+def get_status(is_in_dnd, is_camera_open):
+    if is_in_dnd:
+        return ("in DND", BusylightColor_Red)
+    elif is_camera_open:
+        return ("in meeting", BusylightColor_Orange)
+    else:
+        return ("available", BusylightColor_Green)
+
+
 while True:
     try:
         with hid.Device(vendor_id, product_id) as h:
@@ -116,19 +126,23 @@ while True:
                 ).stdout.decode("utf-8")[0]
                 == "1"
             )
-            bytes_to_send = bytes(
-                sdk.Color(BusylightColor_Red if is_in_dnd else BusylightColor_Green)
+            is_camera_open = (
+                subprocess.run(
+                    ["lsof -n | grep ImagingNetworks"], capture_output=True, shell=True
+                ).returncode
+                == 0
             )
+            status, color = get_status(is_in_dnd, is_camera_open)
+            bytes_to_send = bytes(sdk.Color(color))
             h.write(bytes_to_send)
 
             # https://stackoverflow.com/questions/5419389/how-to-overwrite-the-previous-print-to-stdout
             print(
-                f"\r\033[2K [{datetime.datetime.now()}] "
-                + ("In DND" if is_in_dnd else "Not in DND"),
+                f"\r\033[2K [{datetime.datetime.now()}] " + status,
                 end="",
                 flush=True,
             )
             time.sleep(2)
-    except hid.HIDException as e:
+    except Exception as e:
         print(f"\r\033[2K [{datetime.datetime.now()}] Error: ", e, end="", flush=True)
         time.sleep(10)
