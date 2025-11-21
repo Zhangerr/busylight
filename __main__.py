@@ -120,7 +120,7 @@ while True:
                         "defaults",
                         "read",
                         "com.apple.controlcenter",
-                        "NSStatusItem Visible FocusModes",
+                        "NSStatusItem VisibleCC FocusModes",
                     ],
                     capture_output=True,
                 ).stdout.decode("utf-8")[0]
