@@ -113,19 +113,21 @@ while True:
         with hid.Device(vendor_id, product_id) as h:
             # https://stackoverflow.com/questions/71807412/how-to-read-do-not-disturb-using-applescript
             # https://stackoverflow.com/questions/89228/how-do-i-execute-a-program-or-call-a-system-command
-
-            is_in_dnd = (
-                subprocess.run(
-                    [
-                        "defaults",
-                        "read",
-                        "com.apple.controlcenter",
-                        "NSStatusItem VisibleCC FocusModes",
-                    ],
-                    capture_output=True,
-                ).stdout.decode("utf-8")[0]
-                == "1"
-            )
+            try:
+                is_in_dnd = (
+                    subprocess.run(
+                        [
+                            "defaults",
+                            "read",
+                            "com.apple.controlcenter",
+                            "NSStatusItem VisibleCC FocusModes",
+                        ],
+                        capture_output=True,
+                    ).stdout.decode("utf-8")[0]
+                    == "1"
+                )
+            except:
+                is_in_dnd = False
             is_camera_open = (
                 subprocess.run(
                     ["lsof -n | grep ImagingNetworks"], capture_output=True, shell=True
